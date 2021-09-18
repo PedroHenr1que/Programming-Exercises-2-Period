@@ -1,160 +1,200 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct Product{
-    char name;
+    char name[12];
     float value;
     int amount;
     struct Product *next;
 };
 
-typedef struct{
-    int size;
-    struct Product *data;
-}List;
+struct Element{
+  struct Product *firstNode;
+};
 
-char getOperation(char *line);
-int getProductValue(char *line);
-char getProductName(char *line);
-int getProductAmount(char *line);
-List* creatList();
+void addProduct(char *productName, float productValue, int productAmount,struct Element *organization, int i);
+void removeProduct(char *productName, int amountToBeRemoved,struct Element *organization);
+void removeGroup(float price,struct Element *organization);
+void consult(struct Element *organizatio);
+void searchName(char *productName, struct Element *organization);
+void removeTheProduct(struct Product *product,struct Element *organization);
 
 int main(void){
-    char line[30];
-    char *operation, *productName;
-    float productValue;
-    int productAmount;
-    List *LIST;
+    char operation[12];
+    char productName[12];
+    float productValue, price;
+    int productAmount, i=0;
+    struct Product *LIST;
+    struct Element *organization;
 
-    LIST = creatList();
+    organization = (struct Element *)malloc(sizeof(struct Element));
+    LIST = (struct Product *)malloc(sizeof(struct Product));
+    organization->firstNode = LIST;
 
-    while(scanf("%[^\n]", line) != EOF){
-        operation = getOperation(line);
+    while(scanf("%s", operation) != EOF){
+          
+        if(!strcmp(operation, "INSERIR")){
+            scanf("%s%f%d", productName, &productValue, &productAmount);
 
-        if(*operation == "INSERIR"){
-            productName = getProductName(line);
-            productValue = getProductValue(line);
-            productAmount = getProductAmount(line);
+            addProduct(productName, productValue, productAmount, organization, i);
+            i++;
+        }
 
-            addProduct(LIST, productName, productValue, productAmount);
+        else if(!strcmp(operation, "REMOVER")){
+           scanf("%s%d", productName, &productAmount); 
+           removeProduct(productName,productAmount, organization);
+        }
+
+        else if(!strcmp(operation, "REMOVERGRUPO")){
+          scanf("%f", &price);
+          removeGroup(price, organization);
+        }
+
+        else if(!strcmp(operation, "CONSULTAR")){
+          consult(organization);
+        }
+
+        else if(!strcmp(operation, "PROCURAR")){
+          scanf("%s", productName);
+          searchName(productName, organization);
         }
     }
 }
 
-void addProduct(List *LIST, char *productName, float productValue, int productAmount){
-    struct Product *new;
-    List *lastProduct;
+void searchName(char *productName, struct Element *organization){
+  struct Product *product;
+  int condition = 0;
 
-    
-    lastProduct = LIST;
-    
-    while(lastProduct->data->next != NULL){
-        lastProduct->data = lastProduct->data->next;
+  product = organization->firstNode;
+
+  while(!condition && product != NULL){
+    if(!strcmp(product->name,productName)){
+      printf("\n%s\n- %0.1f\n- %d\n", productName,product->value,product->amount);
+      condition = 1;
+    }
+    product = product->next;
+  }
+
+  if(condition == 0){
+    printf("\n%s nao foi encontrado.\n", productName);
+  }
+  
+}
+
+void consult(struct Element *organization){
+  struct Product *product;
+  float value = 0;
+  int condition = 1;
+
+  product = organization->firstNode;
+
+  while(product != NULL){
+
+    value += product->value*product->amount;
+  
+    product = product -> next;
+  }
+
+  printf("\nAtualmente a lista esta em R$%0.1f\n", value);
+}
+
+void removeGroup(float price, struct Element *organization){
+  struct Product *product,*before;
+
+  before = NULL;
+  product = organization->firstNode;
+  
+  while(product != NULL){
+    if(product->value*100 > price*100){
+      if(before == NULL){
+        organization->firstNode = product->next;
+      }
+      else{
+        before->next = product->next;
+      }
     }
 
+    if(!(product->value*100 > price*100)){
+      before = product;
+    }
+
+    product = product->next;
+
+  }
+
+}
+
+void removeTheProduct(struct Product *productToBeRemoved,struct Element *organization){
+  struct Product *product,*before;
+  int condition = 1;
+
+  before = NULL;
+  product = organization->firstNode;
+  
+  while(product != NULL && condition){
+    if(product == productToBeRemoved){
+      if(before == NULL){
+        organization->firstNode = product->next;
+      }
+      else{
+        before->next = product->next;
+      }
+      condition = 0;
+    }
+
+    if(!(product == productToBeRemoved)){
+      before = product;
+    }
+
+    product = product->next;
+  }
+  
+}
+
+void removeProduct(char *productName, int amountToBeRemoved,struct Element *organization){
+  struct Product *product;
+  product = organization->firstNode;
+
+
+  while(strcmp(product->name,productName)){
+  
+    product = product->next;
+  }
+
+  if(product->amount == amountToBeRemoved){
+    removeTheProduct(product,organization);
+  }
+  else{
+    product->amount = product->amount - amountToBeRemoved;
+  }
+  
+}
+
+void addProduct(char *productName, float productValue, int productAmount, struct Element *organization,int i){
+    struct Product *new, *lastProduct;
+    
+    lastProduct = organization->firstNode;
     new = (struct Product *)malloc(sizeof(struct Product));
-    new->name = *productName;
-    new->value = productValue;
-    new->amount = productAmount;
-
-    lastProduct->data->next = new;
-}
-
-int getProductAmount(char *line){
-    int i,amount = 0,condition = 0;
-    char amountChar;
-
-    for(i = 0; condition;i++){
-        if(line[i]==NULL){
-            amountChar = line[i - 1];
-        }
-    }
-
-    amount = atoi(amountChar);
-
-    return amount;
-}
-
-char getProductName(char *line){
-    int i, condition = 1,spaces = 0,j = 0;
-    char name[10];
-
-    for(i = 0; condition; i++){
-
-        if(line[i] == ' '){
-            spaces++;
-        }
-
-        else if(spaces == 1){
-            name[j] = line[i];
-            j++;
-        }
-
-        else{
-            condition = 0;
-        }
-    }
-
-    return name;
-}
-
-
-int getProductValue(char *line){
-    int i,condition = 1,spaces = 0,j = 0;
-    float num = 0.0;
-    char numStr[6];
-
-    for(i = 0; condition; i++){
-
-        if(line[i] == ' '){
-            spaces ++;
-        }
-
-        else if(spaces>=2){
-
-            if(spaces < 3){
-                numStr[j] = line[i];
-                j++;
-            }
-            else{
-                condition = 0;
-            }
-        }
     
+    if(i == 0){
+      lastProduct->amount = productAmount;
+      lastProduct->value = productValue;
+      strncpy(lastProduct->name,productName,12);
+      lastProduct->next = NULL;
     }
 
-    num = atof(numStr);
+    else{
+    
+      while(lastProduct->next != NULL){
+        lastProduct = lastProduct->next;
+      }
 
-    return num;
-}
-
-char getOperation(char *line){
-    int i;
-    int condition = 1;
-    //char fun[12];
-    char * fun = (char *) calloc (12, sizeof (char));
-
-    for(i = 0; condition; i++){
-
-        if(line[i]!=' ' && line[i]!=NULL){
-            fun[i] = line[i];    
-        }
-        else{
-            condition = 0;
-        }
+      strncpy(new->name,productName,12);
+      new->value = productValue;
+      new->amount = productAmount;
+      new->next = NULL;
+      lastProduct->next = new;
     }
-
-    return fun;
-}
-
-List* creatList(){
-    List *theList;
-    theList = (List *)malloc(sizeof(List));
-
-    if(theList != NULL){
-        theList->size = 0;
-        theList->data = NULL;
-    }
-
-    return(theList);
+    
 }
