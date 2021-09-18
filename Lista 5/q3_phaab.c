@@ -1,200 +1,129 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-struct Product{
-    char name[12];
-    float value;
-    int amount;
-    struct Product *next;
-};
+typedef struct{
+    struct Element *start;
+    struct Element *end;
+}Queue;
 
 struct Element{
-  struct Product *firstNode;
+    int id;
+    int age;
+    struct Element *next;
 };
 
-void addProduct(char *productName, float productValue, int productAmount,struct Element *organization, int i);
-void removeProduct(char *productName, int amountToBeRemoved,struct Element *organization);
-void removeGroup(float price,struct Element *organization);
-void consult(struct Element *organizatio);
-void searchName(char *productName, struct Element *organization);
-void removeTheProduct(struct Product *product,struct Element *organization);
+void insert(Queue *theQueue, int idNew,int ageNew);
+int removePatient(Queue *theQueue);
+void printQueue(Queue *theQueueNoSeniors,Queue *theQueueSeniors);
 
 int main(void){
-    char operation[12];
-    char productName[12];
-    float productValue, price;
-    int productAmount, i=0;
-    struct Product *LIST;
-    struct Element *organization;
+    Queue *theQueueSeniors,*theQueueNoSeniors;
+    char operation = ' ';
+    int id = 0, age = 0, i = 0,priority;
 
-    organization = (struct Element *)malloc(sizeof(struct Element));
-    LIST = (struct Product *)malloc(sizeof(struct Product));
-    organization->firstNode = LIST;
+    theQueueSeniors = (Queue *)malloc(sizeof(Queue *));
+    theQueueNoSeniors = (Queue *)malloc(sizeof(Queue *));
 
-    while(scanf("%s", operation) != EOF){
-          
-        if(!strcmp(operation, "INSERIR")){
-            scanf("%s%f%d", productName, &productValue, &productAmount);
+    scanf("%d", &priority);
+    while(operation != 'f'){
+        scanf(" %c", &operation);
+        if(operation == 'a'){
+            scanf("%d%d", &id,&age);
 
-            addProduct(productName, productValue, productAmount, organization, i);
-            i++;
+            if(age > 60){
+                insert(theQueueSeniors, id, age);
+            }
+            else{
+                insert(theQueueNoSeniors, id, age);
+            }
+        }
+        
+        else if(operation == 'r'){
+
+            if(theQueueSeniors->start != NULL && i < priority){
+                removePatient(theQueueSeniors);
+                i++;
+            }
+            
+            else if(theQueueNoSeniors->start != NULL){
+                removePatient(theQueueNoSeniors);
+                i = 0;
+            }
+
+            else{
+                removePatient(theQueueSeniors);
+                i = 0;
+            }
         }
 
-        else if(!strcmp(operation, "REMOVER")){
-           scanf("%s%d", productName, &productAmount); 
-           removeProduct(productName,productAmount, organization);
+        else if(operation == 'i'){
+            printQueue(theQueueNoSeniors, theQueueSeniors);
         }
 
-        else if(!strcmp(operation, "REMOVERGRUPO")){
-          scanf("%f", &price);
-          removeGroup(price, organization);
-        }
-
-        else if(!strcmp(operation, "CONSULTAR")){
-          consult(organization);
-        }
-
-        else if(!strcmp(operation, "PROCURAR")){
-          scanf("%s", productName);
-          searchName(productName, organization);
-        }
     }
 }
 
-void searchName(char *productName, struct Element *organization){
-  struct Product *product;
-  int condition = 0;
+void printQueue(Queue *theQueueNoSeniors,Queue *theQueueSeniors){
 
-  product = organization->firstNode;
+    struct Element *patientSeniors = theQueueSeniors->start, *patientNoSeniors = theQueueNoSeniors->start;
 
-  while(!condition && product != NULL){
-    if(!strcmp(product->name,productName)){
-      printf("\n%s\n- %0.1f\n- %d\n", productName,product->value,product->amount);
-      condition = 1;
+    printf("\n\nfila de idosos:");
+    if(patientSeniors == NULL){
+        printf("\nfila vazia!");
     }
-    product = product->next;
-  }
-
-  if(condition == 0){
-    printf("\n%s nao foi encontrado.\n", productName);
-  }
-  
-}
-
-void consult(struct Element *organization){
-  struct Product *product;
-  float value = 0;
-  int condition = 1;
-
-  product = organization->firstNode;
-
-  while(product != NULL){
-
-    value += product->value*product->amount;
-  
-    product = product -> next;
-  }
-
-  printf("\nAtualmente a lista esta em R$%0.1f\n", value);
-}
-
-void removeGroup(float price, struct Element *organization){
-  struct Product *product,*before;
-
-  before = NULL;
-  product = organization->firstNode;
-  
-  while(product != NULL){
-    if(product->value*100 > price*100){
-      if(before == NULL){
-        organization->firstNode = product->next;
-      }
-      else{
-        before->next = product->next;
-      }
-    }
-
-    if(!(product->value*100 > price*100)){
-      before = product;
-    }
-
-    product = product->next;
-
-  }
-
-}
-
-void removeTheProduct(struct Product *productToBeRemoved,struct Element *organization){
-  struct Product *product,*before;
-  int condition = 1;
-
-  before = NULL;
-  product = organization->firstNode;
-  
-  while(product != NULL && condition){
-    if(product == productToBeRemoved){
-      if(before == NULL){
-        organization->firstNode = product->next;
-      }
-      else{
-        before->next = product->next;
-      }
-      condition = 0;
-    }
-
-    if(!(product == productToBeRemoved)){
-      before = product;
-    }
-
-    product = product->next;
-  }
-  
-}
-
-void removeProduct(char *productName, int amountToBeRemoved,struct Element *organization){
-  struct Product *product;
-  product = organization->firstNode;
-
-
-  while(strcmp(product->name,productName)){
-  
-    product = product->next;
-  }
-
-  if(product->amount == amountToBeRemoved){
-    removeTheProduct(product,organization);
-  }
-  else{
-    product->amount = product->amount - amountToBeRemoved;
-  }
-  
-}
-
-void addProduct(char *productName, float productValue, int productAmount, struct Element *organization,int i){
-    struct Product *new, *lastProduct;
-    
-    lastProduct = organization->firstNode;
-    new = (struct Product *)malloc(sizeof(struct Product));
-    
-    if(i == 0){
-      lastProduct->amount = productAmount;
-      lastProduct->value = productValue;
-      strncpy(lastProduct->name,productName,12);
-      lastProduct->next = NULL;
-    }
-
     else{
-    
-      while(lastProduct->next != NULL){
-        lastProduct = lastProduct->next;
-      }
-
-      strncpy(new->name,productName,12);
-      new->value = productValue;
-      new->amount = productAmount;
-      new->next = NULL;
-      lastProduct->next = new;
+        while(patientSeniors != NULL){
+            printf("\nID: %d IDADE: %d", patientSeniors->id,patientSeniors->age);
+            patientSeniors = patientSeniors->next;
+        }
     }
     
+
+    printf("\nfila de nao-idosos:");
+    if(patientNoSeniors == NULL){
+        printf("\nfila vazia!");
+    }
+    else{
+        while(patientNoSeniors != NULL){
+            printf("\nID: %d IDADE: %d", patientNoSeniors->id,patientNoSeniors->age);
+            patientNoSeniors = patientNoSeniors->next;
+        }
+    }
+    printf("\n----------");
+}
+
+void insert(Queue *theQueue, int idNew,int ageNew){
+
+    struct Element *new;
+    new = (struct Element *)malloc(sizeof(struct Element *));
+
+    new->next = NULL;
+    new->id = idNew;
+    new->age = ageNew;
+
+    if(theQueue->start == NULL){
+        theQueue->end = new;
+        theQueue->start = new;
+    }
+    else{
+        theQueue->end->next = new;
+        theQueue->end = new;
+    }
+}
+
+int removePatient(Queue *theQueue){
+    struct Element *out;
+
+    if(theQueue->start == NULL){
+      theQueue->end = NULL;
+      return(0);
+    }
+    
+    out = theQueue->start;
+    theQueue->start = out->next;
+
+    
+    free(out);
+
+    return(1);
 }

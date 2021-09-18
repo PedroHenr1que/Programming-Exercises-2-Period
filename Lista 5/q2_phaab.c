@@ -1,129 +1,106 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 typedef struct{
     struct Element *start;
-    struct Element *end;
-}Queue;
+}stack;
 
 struct Element{
-    int id;
-    int age;
+    int info;
     struct Element *next;
 };
 
-void insert(Queue *theQueue, int idNew,int ageNew);
-int removePatient(Queue *theQueue);
-void printQueue(Queue *theQueueNoSeniors,Queue *theQueueSeniors);
+int push(stack *theStack, int value);
+int pop(stack *theStack);
+void pBiggestSmallest(stack *theStack);
 
 int main(void){
-    Queue *theQueueSeniors,*theQueueNoSeniors;
-    char operation = ' ';
-    int id = 0, age = 0, i = 0,priority;
+    stack *theStack;
+    char operation[4];
+    int value;
 
-    theQueueSeniors = (Queue *)malloc(sizeof(Queue *));
-    theQueueNoSeniors = (Queue *)malloc(sizeof(Queue *));
+    theStack = (stack *)malloc(sizeof(stack));
 
-    scanf("%d", &priority);
-    while(operation != 'f'){
-        scanf(" %c", &operation);
-        if(operation == 'a'){
-            scanf("%d%d", &id,&age);
 
-            if(age > 60){
-                insert(theQueueSeniors, id, age);
-            }
-            else{
-                insert(theQueueNoSeniors, id, age);
-            }
+    while(scanf("\n%s", operation) != EOF){
+
+        if(!strcmp(operation, "push")){
+            scanf("%d", &value);
+            push(theStack, value);
         }
-        
-        else if(operation == 'r'){
-
-            if(theQueueSeniors->start != NULL && i < priority){
-                removePatient(theQueueSeniors);
-                i++;
-            }
-            
-            else if(theQueueNoSeniors->start != NULL){
-                removePatient(theQueueNoSeniors);
-                i = 0;
-            }
-
-            else{
-                removePatient(theQueueSeniors);
-                i = 0;
-            }
+        else if(!strcmp(operation, "pop")){
+            pop(theStack);
         }
-
-        else if(operation == 'i'){
-            printQueue(theQueueNoSeniors, theQueueSeniors);
+        else{
+          pBiggestSmallest(theStack);
         }
-
     }
+
 }
 
-void printQueue(Queue *theQueueNoSeniors,Queue *theQueueSeniors){
+void pBiggestSmallest(stack *theStack){
+    int biggest = 0, smallest = 0, i = 0;
 
-    struct Element *patientSeniors = theQueueSeniors->start, *patientNoSeniors = theQueueNoSeniors->start;
+    struct Element *node = theStack->start;
 
-    printf("\n\nfila de idosos:");
-    if(patientSeniors == NULL){
-        printf("\nfila vazia!");
-    }
-    else{
-        while(patientSeniors != NULL){
-            printf("\nID: %d IDADE: %d", patientSeniors->id,patientSeniors->age);
-            patientSeniors = patientSeniors->next;
+    if(node->next != NULL){
+        while(node != NULL){
+
+            if(i == 0){
+                biggest = node->info;
+                smallest = node->info;
+            }
+            else{
+                if(node->info > biggest){
+                    biggest = node->info;
+                }
+                else if(node->info < smallest){
+                    smallest = node->info;
+                }
+
+            }
+            i++;
+            node = node->next;
         }
+
+        printf("\n%d",biggest - smallest);
+    }
+
+    else{
+        printf("\n%d", 0);
     }
     
-
-    printf("\nfila de nao-idosos:");
-    if(patientNoSeniors == NULL){
-        printf("\nfila vazia!");
-    }
-    else{
-        while(patientNoSeniors != NULL){
-            printf("\nID: %d IDADE: %d", patientNoSeniors->id,patientNoSeniors->age);
-            patientNoSeniors = patientNoSeniors->next;
-        }
-    }
-    printf("\n----------");
 }
 
-void insert(Queue *theQueue, int idNew,int ageNew){
+int push(stack *theStack, int value){
 
     struct Element *new;
+
     new = (struct Element *)malloc(sizeof(struct Element *));
 
-    new->next = NULL;
-    new->id = idNew;
-    new->age = ageNew;
+    if(new == NULL){
+        return(0);
+    }
 
-    if(theQueue->start == NULL){
-        theQueue->end = new;
-        theQueue->start = new;
-    }
-    else{
-        theQueue->end->next = new;
-        theQueue->end = new;
-    }
+
+    new->next = theStack->start;
+    new->info = value;
+    theStack->start = new;
+    return(1);
 }
 
-int removePatient(Queue *theQueue){
+int pop(stack *theStack){
     struct Element *out;
-
-    if(theQueue->start == NULL){
-      theQueue->end = NULL;
-      return(0);
+    
+    if(theStack->start == NULL){
+        return(0);
     }
-    
-    out = theQueue->start;
-    theQueue->start = out->next;
 
-    
+    out = theStack->start;
+    theStack->start = out->next;
+
+    printf("\n%d",out->info);
+
     free(out);
-
     return(1);
 }
