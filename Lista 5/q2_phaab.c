@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 typedef struct{
-    struct Element *start;
+    struct Element *head;
 }stack;
 
 struct Element{
@@ -41,7 +41,7 @@ int main(void){
 void pBiggestSmallest(stack *theStack){
     int biggest = 0, smallest = 0, i = 0;
 
-    struct Element *node = theStack->start;
+    struct Element *node = theStack->head;
 
     if(node->next != NULL){
         while(node != NULL){
@@ -83,21 +83,21 @@ int push(stack *theStack, int value){
     }
 
 
-    new->next = theStack->start;
+    new->next = theStack->head;
     new->info = value;
-    theStack->start = new;
+    theStack->head = new;
     return(1);
 }
 
 int pop(stack *theStack){
     struct Element *out;
     
-    if(theStack->start == NULL){
+    if(theStack->head == NULL){
         return(0);
     }
 
-    out = theStack->start;
-    theStack->start = out->next;
+    out = theStack->head;
+    theStack->head = out->next;
 
     printf("\n%d",out->info);
 
