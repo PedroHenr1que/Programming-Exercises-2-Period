@@ -25,17 +25,23 @@ int main(void)
 {
         struct Node *root;
         int num;
-
+	root = NULL;
 	while (scanf("%d", &num) != EOF) {
+    		printf("\n----");
 		printf("\nAdicionando %d", num);
 		root = insertAVL(num, root, root);
+		int x = conditionAVL;
+		int y = conditionAVL;
 
 		if (conditionAVL) {
 			printAVL(root, 1); //print avl depois balanceamento
 		} else {
 			printAVL(root, 2); //print avl, não houve balanceamento
 		}
+
+		conditionAVL = 0;
 	}
+	printf("\n----");
 }
 
 int hight(struct Node *no)
@@ -122,34 +128,31 @@ struct Node * insertAVL(int x, struct Node *root, struct Node *startRoot)
 			
                         if ((hight(root->left) - hight(root->right)) == 2) {
 				printAVL(startRoot, 0); //print avl antes do balanceamento
-                                if (x < root->left->num) {
+                                if (x <= root->left->num) {
                                         root = simpleRotationRight(root);
                                 } else {
                                         root = doubleRotationRight(root);
                                 }
 
 				conditionAVL = 1;// para print avl depois do balancemanto
-                        } else {
-				conditionAVL = 0;// quando não foi necessario balanceamento
-			}
+                        }
                 } else {
                         root->right = insertAVL(x, root->right, startRoot);
 
                         if ((hight(root->right) - hight(root->left)) == 2) {
 				printAVL(startRoot, 0);
-                                if (x > root->right->num) {
+                                if (x >= root->right->num) {
                                         root = simpleRotationLeft(root);
                                 } else {
                                         root = doubleRotationLeft(root);
                                 }
 
 				conditionAVL = 1;// para print avl depois do balancemanto
-                        } else {
-				conditionAVL = 0;// quando não foi necessario balanceamento
-			}
+                        }
                 }
                 updateHight(root);
         }
+
 
         return root;
 }
@@ -158,33 +161,28 @@ void printAVL(struct Node *root, int condition)
 {
 
 	if (condition == 0) {
-		printf("Antes de ajustar balanceamento...\n\t");
+		printf("\nAntes de ajustar balanceamento...\n  ");
 		preOrderPrint(root);
-		prinft("\n----");
 
 	} else if (condition == 1) {
-		printf("Depois de ajustar balanceamento...\n\t");
+		printf("\nDepois de ajustar balanceamento...\n  ");
 		preOrderPrint(root);
-		prinft("\n----");
-
+		
 	} else {
-		printf("Continuou AVL...\n\t");
-		preOrderPrint(root);;
-		prinft("\n----");
-
+		printf("\nContinuou AVL...\n  ");
+		preOrderPrint(root);
 	}
 }
 
 void preOrderPrint(struct Node *node)
 {
 	if (node != NULL) {
-		printf("( ");
-		printf("%d", node->num);
+		printf(" (");
+		printf(" %d ", node->num);
 		preOrderPrint(node->left);
-		printf(" )");
 		preOrderPrint(node->right);
-		printf(" )");
+		printf(") ");
 	} else {
-		printf("( ");
+		printf(" () ");
 	}
 }
