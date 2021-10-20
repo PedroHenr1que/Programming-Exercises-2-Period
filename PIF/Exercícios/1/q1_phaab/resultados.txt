@@ -1,0 +1,15 @@
+---Lista Invertida---
+Resultado: 4 3 2 2 1 
+
+---Lista sem o enésimo termo---
+Resultado: 3 2 2 1 
+
+---Lista Invertida---
+Resultado: 1 2 2 3 
+
+---Quantidade de vezes que X aparece---
+Resultado: 2 
+
+---Números que não repetem---
+Resultado: 1 3 
+

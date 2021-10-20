@@ -1,0 +1,5 @@
+1 Pamela Bezerra -55.30
+2 Roberto Almeida 1000.00
+3 Adele Queiroz 500.00
+4 Claudio Cavalcanti -345.60
+5 Fernando Silva 650.00
