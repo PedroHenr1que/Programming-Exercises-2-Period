@@ -42,7 +42,7 @@ orderTriple x = (smallest x, mid x, biggest x)
 mid :: (Int, Int, Int) -> Int
 mid (x, y, z)
   | x < y && x > z = x
-  | y < x && y > z = y
+  | y > x && y < z = y
   | otherwise = z
 
 biggest :: (Int, Int, Int) ->Int
