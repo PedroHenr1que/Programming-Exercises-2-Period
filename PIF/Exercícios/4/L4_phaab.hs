@@ -32,13 +32,13 @@ concatTuple :: (String,Int) -> (String,Int) -> (String,Int,String,Int)
 concatTuple (n1,a1) (n2,a2) = (n1,a1,n2,a2)
 
 myMin :: [Aluno] -> (String,Int)
-myMin [] = ("Nao Encontrado", 10000)
+myMin [(c,n,a,g,e)] = (n,a)
 myMin ((c,n,a,g,e):xs)
   | a < snd(myMin xs) = (n,a)
   | otherwise = myMin xs
 
 myMax :: [Aluno] -> (String,Int)
-myMax [] = ("Nao Encontrado", -1)
+myMax [(c,n,a,g,e)] = (n,a)
 myMax ((c,n,a,g,e):xs)
   | a > snd(myMax xs) = (n,a)
   | otherwise = myMax xs
